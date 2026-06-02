@@ -1,19 +1,42 @@
-import { FeedCard } from "@/components/feed/FeedCard"
+import Image from "next/image"
+import { FeedList } from "@/components/feed/FeedList"
 import { BottomTabBar } from "@/components/shell/BottomTabBar"
 import { Badge } from "@/components/ui/badge"
 import { feedItems, highlightedUpdates } from "@/lib/mock/feed"
+import { cn } from "@/lib/utils"
+
+function isUrgentStatus(status: string) {
+  if (status.includes("直播中") || status.includes("即将开始")) return true
+  if (status.includes("今晚")) return true
+  return /\d{1,2}:\d{2}/.test(status)
+}
 
 export default function FeedPage() {
   return (
-    <div className="flex min-h-dvh w-full justify-center bg-zinc-50">
+    <div className="flex min-h-dvh w-full justify-center bg-white">
       <div className="relative w-full max-w-[430px] flex-1">
-        <header className="safe-top px-5 pt-4">
+        <div
+          className="pointer-events-none absolute inset-x-0 top-0 h-[460px] bg-gradient-to-b from-violet-50 via-violet-50/45 to-white"
+          aria-hidden
+        />
+
+        <header className="safe-top relative px-5 pt-4 pb-1">
           <div className="flex items-end justify-between gap-4">
             <div className="flex flex-col gap-1">
-              <div className="text-lg font-semibold tracking-tight">
-                🥜 核桃情报局
+              <div className="flex items-center gap-2">
+                <Image
+                  src="/images/feed/hetao.jpg"
+                  alt=""
+                  width={36}
+                  height={36}
+                  className="h-9 w-9 shrink-0 object-contain"
+                  priority
+                />
+                <div className="text-lg font-semibold tracking-tight text-zinc-900">
+                  核桃情报局
+                </div>
               </div>
-              <div className="text-sm text-muted-foreground">
+              <div className="text-sm text-zinc-500">
                 陪你记录每一个闪闪发光的瞬间 ✨
               </div>
             </div>
@@ -23,36 +46,36 @@ export default function FeedPage() {
             </div>
           </div>
 
-          <div className="mt-3 grid grid-cols-3 gap-2.5">
-            <div className="rounded-2xl bg-white px-3.5 py-2.5 ring-1 ring-black/5">
+          <div className="mt-2.5 grid grid-cols-3 gap-2">
+            <div className="rounded-2xl border border-white/70 bg-white/85 px-3.5 py-2 shadow-[0_2px_10px_rgba(91,33,182,0.05)] ring-1 ring-violet-100/70 backdrop-blur-sm">
               <div className="text-[11px] text-muted-foreground">今日更新</div>
-              <div className="mt-1 text-lg font-semibold text-violet-600">5</div>
+              <div className="mt-0.5 text-lg font-semibold text-violet-600">5</div>
             </div>
-            <div className="rounded-2xl bg-white px-3.5 py-2.5 ring-1 ring-black/5">
+            <div className="rounded-2xl border border-white/70 bg-white/85 px-3.5 py-2 shadow-[0_2px_10px_rgba(91,33,182,0.05)] ring-1 ring-violet-100/70 backdrop-blur-sm">
               <div className="text-[11px] text-muted-foreground">即将活动</div>
-              <div className="mt-1 text-lg font-semibold">2</div>
+              <div className="mt-0.5 text-lg font-semibold text-zinc-900">2</div>
             </div>
-            <div className="rounded-2xl bg-white px-3.5 py-2.5 ring-1 ring-black/5">
+            <div className="rounded-2xl border border-white/70 bg-white/85 px-3.5 py-2 shadow-[0_2px_10px_rgba(91,33,182,0.05)] ring-1 ring-violet-100/70 backdrop-blur-sm">
               <div className="text-[11px] text-muted-foreground">我的收藏</div>
-              <div className="mt-1 text-lg font-semibold">0</div>
+              <div className="mt-0.5 text-lg font-semibold text-zinc-900">0</div>
             </div>
           </div>
         </header>
 
-        <main className="px-5 pb-28 pt-3">
+        <main className="relative px-5 pb-28">
           <section aria-label="今日不容错过">
             <h2 className="text-[15px] font-semibold tracking-tight text-zinc-900">
               🌟 今日不容错过
             </h2>
-            <ul className="mt-2 flex flex-col gap-1.5">
+            <ul className="mt-1.5 flex flex-col gap-1.5">
               {highlightedUpdates.map((update) => (
                 <li key={update.id}>
                   <button
                     type="button"
-                    className="flex w-full items-center gap-2.5 rounded-2xl bg-white px-3 py-2.5 text-left ring-1 ring-black/5 transition-colors active:bg-violet-50/80"
+                    className="flex w-full items-center gap-2 rounded-2xl border border-white/70 bg-white/90 px-3 py-2 text-left shadow-[0_2px_10px_rgba(91,33,182,0.05)] ring-1 ring-violet-100/60 transition-colors active:bg-violet-50/80"
                   >
                     <span
-                      className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-violet-50 text-lg leading-none"
+                      className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-violet-50 text-base leading-none ring-1 ring-violet-100/80"
                       aria-hidden
                     >
                       {update.icon}
@@ -69,7 +92,14 @@ export default function FeedPage() {
                       <Badge className="h-5 bg-violet-50 px-1.5 text-[10px] font-medium text-violet-700 ring-1 ring-violet-200/80">
                         {update.source}
                       </Badge>
-                      <span className="text-[10px] font-medium text-violet-600">
+                      <span
+                        className={cn(
+                          "text-[10px] font-medium",
+                          isUrgentStatus(update.status)
+                            ? "text-rose-600"
+                            : "text-violet-600"
+                        )}
+                      >
                         {update.status}
                       </span>
                     </div>
@@ -79,21 +109,8 @@ export default function FeedPage() {
             </ul>
           </section>
 
-          <section className="mt-4" aria-label="最新动态">
-            <div>
-              <h2 className="text-[15px] font-semibold tracking-tight text-zinc-900">
-                🫧 最新动态
-              </h2>
-              <p className="mt-0.5 text-[12px] text-muted-foreground">
-                今天也有新的惊喜
-              </p>
-            </div>
-
-            <div className="mt-2 flex flex-col gap-2">
-              {feedItems.map((item) => (
-                <FeedCard key={item.id} item={item} />
-              ))}
-            </div>
+          <section className="mt-3" aria-label="最新动态">
+            <FeedList items={feedItems} />
           </section>
         </main>
 

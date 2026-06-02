@@ -87,4 +87,14 @@ export const feedItems: FeedItem[] = [
     thumbnailUrl: "/images/feed/zlh5.jpg",
     originalUrl: "https://live.taobao.com/",
   },
+  {
+    id: "ins-1",
+    source: "INS",
+    type: "图片",
+    title: "纽约街拍更新",
+    description: "张凌赫更新INS照片",
+    publishedAt: "3小时前",
+    thumbnailUrl: "/images/feed/zlh2.jpg",
+    originalUrl: "https://www.instagram.com/",
+  },
 ]

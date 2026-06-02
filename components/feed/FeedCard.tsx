@@ -7,11 +7,13 @@ import { Card, CardContent } from "@/components/ui/card"
 import { cn } from "@/lib/utils"
 
 const THUMB_WIDTH_PX = 96
+const THUMB_HEIGHT_CLASS = "min-h-[124px]"
 
 const platformLogo: Record<SourcePlatform, string> = {
   微博: "/logos/weibo.png",
   小红书: "/logos/redbook.png",
   抖音: "/logos/douyin.png",
+  INS: "/logos/ins.png",
   腾讯视频: "/logos/tengxun.png",
   淘宝直播: "/logos/taobao.png",
 }
@@ -27,6 +29,8 @@ function getPrimaryActionLabel(source: SourcePlatform) {
       return "查看笔记"
     case "抖音":
       return "查看视频"
+    case "INS":
+      return "查看INS"
     case "腾讯视频":
       return "立即观看"
     case "淘宝直播":
@@ -65,7 +69,7 @@ function FeedThumbnail({
   return (
     <div
       className={cn(
-        "relative h-[124px] w-[96px] shrink-0 overflow-hidden rounded-xl ring-1 ring-black/5",
+        "relative h-[124px] w-[96px] shrink-0 overflow-hidden rounded-xl ring-1 ring-violet-100/70",
         className
       )}
     >
@@ -87,11 +91,13 @@ export function FeedCard({ item }: { item: FeedItem }) {
   return (
     <Card
       size="sm"
-      className="gap-0 rounded-2xl pb-1.5 pt-2.5 shadow-[0_1px_0_rgba(0,0,0,0.02)] ring-1 ring-black/5"
+      className="gap-0 rounded-2xl border border-violet-100/60 bg-white pb-1.5 pt-2.5 shadow-[0_2px_12px_rgba(91,33,182,0.06)] ring-1 ring-violet-100/50"
     >
       <CardContent className="px-0 pt-0 pb-0">
         <div className="flex items-start gap-3 pl-4 pr-3.5">
-          <div className="flex min-w-0 flex-1 flex-col">
+          <div
+            className={cn("flex min-w-0 flex-1 flex-col", THUMB_HEIGHT_CLASS)}
+          >
             <div className="flex items-center justify-between gap-2">
               <div className="flex min-w-0 items-center gap-1">
                 <PlatformIcon source={item.source} />
@@ -112,7 +118,7 @@ export function FeedCard({ item }: { item: FeedItem }) {
               {item.description}
             </div>
 
-            <div className="mt-2.5 flex flex-wrap items-center gap-1.5">
+            <div className="mt-auto flex flex-wrap items-center gap-1.5 pt-2">
               <a
                 href={item.originalUrl}
                 target="_blank"
@@ -131,7 +137,7 @@ export function FeedCard({ item }: { item: FeedItem }) {
                 className={cn(
                   softActionBase,
                   "bg-zinc-100 text-zinc-600 hover:bg-zinc-100/80",
-                  isFavorited && "bg-violet-50 text-violet-600"
+                  isFavorited && "bg-rose-50 text-rose-600"
                 )}
                 aria-label={isFavorited ? "取消收藏" : "收藏"}
               >
