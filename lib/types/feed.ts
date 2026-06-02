@@ -9,7 +9,7 @@ export interface FeedItem {
   title: string
   description: string
   publishedAt: string
-  thumbnailUrl: string
+  thumbnailUrl?: string
   originalUrl: string
 }
 
