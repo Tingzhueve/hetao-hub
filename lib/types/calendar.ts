@@ -18,10 +18,12 @@ export interface ActivityImage {
 
 export interface BaseActivity {
   id: string
+  slug: string
   phase: ActivityPhase
   title: string
   platform: ActivityPlatform
   date: string
+  description: string
   image: ActivityImage
 }
 

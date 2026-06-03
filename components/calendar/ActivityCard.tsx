@@ -1,6 +1,11 @@
+"use client"
+
 import Image from "next/image"
+import { useRouter } from "next/navigation"
+import * as React from "react"
 
 import { Badge } from "@/components/ui/badge"
+import { useToast } from "@/components/ui/toast"
 import { cn } from "@/lib/utils"
 import { upcomingStatusLabel } from "@/lib/mock/calendar"
 import type {
@@ -21,6 +26,10 @@ const platformAccent: Record<ActivityPlatform, string> = {
 
 const actionBaseClass =
   "inline-flex h-8 shrink-0 items-center justify-center rounded-full px-3 text-[11px] font-medium transition-colors active:scale-[0.98]"
+
+function reminderStorageKey(activityId: string) {
+  return `walnut-intelligence:reminder:${activityId}`
+}
 
 type ParsedDateBlock = {
   top: string
@@ -126,108 +135,177 @@ function PlatformBadge({ platform }: { platform: ActivityPlatform }) {
   )
 }
 
-function UpcomingCard({ activity }: { activity: UpcomingActivity }) {
-  const dateDisplay = parseDateDisplay(activity.date)
+function ActivityShell({
+  slug,
+  children,
+}: {
+  slug: string
+  children: React.ReactNode
+}) {
+  const router = useRouter()
 
   return (
-    <article className="rounded-[24px] border border-violet-100/70 bg-white/95 p-3.5 shadow-[0_4px_16px_rgba(91,33,182,0.06)] ring-1 ring-violet-100/50 backdrop-blur-sm">
-      <div className="flex items-start gap-3">
-        <DateBlock date={activity.date} />
+    <article
+      role="link"
+      tabIndex={0}
+      onClick={() => router.push(`/calendar/${slug}`)}
+      onKeyDown={(event) => {
+        if (event.key === "Enter" || event.key === " ") {
+          event.preventDefault()
+          router.push(`/calendar/${slug}`)
+        }
+      }}
+      className="block rounded-[24px] cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-300"
+    >
+      {children}
+    </article>
+  )
+}
 
-        <div className="min-w-0 flex-1">
-          <div className="flex items-start justify-between gap-3">
-            <div className="min-w-0">
-              <h3 className="text-[14px] leading-5 font-semibold tracking-tight text-zinc-900">
-                {activity.title}
-              </h3>
-              <div className="mt-1 flex flex-wrap items-center gap-1.5">
-                <PlatformBadge platform={activity.platform} />
-                <Badge className="h-5 bg-violet-50 px-1.5 text-[10px] font-medium text-violet-700 ring-1 ring-violet-100">
-                  {upcomingStatusLabel[activity.status]}
-                </Badge>
+function UpcomingCard({ activity }: { activity: UpcomingActivity }) {
+  const dateDisplay = parseDateDisplay(activity.date)
+  const [hasReminder, setHasReminder] = React.useState(false)
+  const { showToast } = useToast()
+
+  React.useEffect(() => {
+    const storedValue = window.localStorage.getItem(reminderStorageKey(activity.id))
+    setHasReminder(storedValue === "true")
+  }, [activity.id])
+
+  function handleAddToCalendar(event: React.MouseEvent<HTMLButtonElement>) {
+    event.stopPropagation()
+    showToast("📅 已加入日历")
+  }
+
+  function handleSetReminder(event: React.MouseEvent<HTMLButtonElement>) {
+    event.stopPropagation()
+    if (hasReminder) {
+      window.localStorage.removeItem(reminderStorageKey(activity.id))
+      setHasReminder(false)
+      showToast("已取消提醒")
+      return
+    }
+
+    window.localStorage.setItem(reminderStorageKey(activity.id), "true")
+    setHasReminder(true)
+    showToast("🔔 已设置提醒")
+  }
+
+  return (
+    <ActivityShell slug={activity.slug}>
+        <div className="rounded-[24px] border border-violet-100/70 bg-white/95 p-3.5 shadow-[0_4px_16px_rgba(91,33,182,0.06)] ring-1 ring-violet-100/50 backdrop-blur-sm transition-transform active:scale-[0.99]">
+        <div className="flex items-start gap-3">
+          <DateBlock date={activity.date} />
+
+          <div className="min-w-0 flex-1">
+            <div className="flex items-start justify-between gap-3">
+              <div className="min-w-0">
+                <h3 className="text-[14px] leading-5 font-semibold tracking-tight text-zinc-900">
+                  {activity.title}
+                </h3>
+                <div className="mt-1 flex flex-wrap items-center gap-1.5">
+                  <PlatformBadge platform={activity.platform} />
+                  <Badge className="h-5 bg-violet-50 px-1.5 text-[10px] font-medium text-violet-700 ring-1 ring-violet-100">
+                    {upcomingStatusLabel[activity.status]}
+                  </Badge>
+                </div>
+                <div className="mt-2 text-[11px] text-zinc-500">
+                  {dateDisplay.detail}
+                </div>
               </div>
-              <div className="mt-2 text-[11px] text-zinc-500">
-                {dateDisplay.detail}
-              </div>
+
+              <ActivityImage src={activity.image.src} alt={activity.image.alt} />
             </div>
 
-            <ActivityImage src={activity.image.src} alt={activity.image.alt} />
-          </div>
-
-          <div className="mt-3 flex flex-wrap items-center gap-2">
-            <button
-              type="button"
-              className={cn(
-                actionBaseClass,
-                "bg-violet-100 text-violet-700 hover:bg-violet-100/80"
-              )}
-            >
-              加入日历
-            </button>
-            <button
-              type="button"
-              className={cn(
-                actionBaseClass,
-                "bg-zinc-100 text-zinc-600 hover:bg-zinc-100/80"
-              )}
-            >
-              设置提醒
-            </button>
+            <div className="mt-3 flex flex-wrap items-center gap-2">
+              <button
+                type="button"
+                onClick={handleAddToCalendar}
+                className={cn(
+                  actionBaseClass,
+                  "bg-violet-100 text-violet-700 hover:bg-violet-100/80"
+                )}
+              >
+                加入日历
+              </button>
+              <button
+                type="button"
+                onClick={handleSetReminder}
+                className={cn(
+                  actionBaseClass,
+                  hasReminder
+                    ? "bg-violet-100 text-violet-700 ring-1 ring-violet-200/80"
+                    : "bg-zinc-100 text-zinc-600 hover:bg-zinc-100/80"
+                )}
+              >
+                {hasReminder ? "🔔 已提醒" : "设置提醒"}
+              </button>
+            </div>
           </div>
         </div>
-      </div>
-    </article>
+        </div>
+      </ActivityShell>
   )
 }
 
 function PastCard({ activity }: { activity: PastActivity }) {
   const dateDisplay = parseDateDisplay(activity.date)
+  const { showToast } = useToast()
+
+  function handleComingSoon(event: React.MouseEvent<HTMLButtonElement>) {
+    event.stopPropagation()
+    showToast("即将上线")
+  }
 
   return (
-    <article className="rounded-[24px] border border-violet-100/70 bg-white/95 p-3.5 shadow-[0_4px_16px_rgba(91,33,182,0.06)] ring-1 ring-violet-100/50 backdrop-blur-sm">
-      <div className="flex items-start gap-3">
-        <DateBlock date={activity.date} />
+    <ActivityShell slug={activity.slug}>
+        <div className="rounded-[24px] border border-violet-100/70 bg-white/95 p-3.5 shadow-[0_4px_16px_rgba(91,33,182,0.06)] ring-1 ring-violet-100/50 backdrop-blur-sm transition-transform active:scale-[0.99]">
+        <div className="flex items-start gap-3">
+          <DateBlock date={activity.date} />
 
-        <div className="min-w-0 flex-1">
-          <div className="flex items-start justify-between gap-3">
-            <div className="min-w-0">
-              <h3 className="text-[14px] leading-5 font-semibold tracking-tight text-zinc-900">
-                {activity.title}
-              </h3>
-              <div className="mt-1 flex flex-wrap items-center gap-1.5">
-                <PlatformBadge platform={activity.platform} />
+          <div className="min-w-0 flex-1">
+            <div className="flex items-start justify-between gap-3">
+              <div className="min-w-0">
+                <h3 className="text-[14px] leading-5 font-semibold tracking-tight text-zinc-900">
+                  {activity.title}
+                </h3>
+                <div className="mt-1 flex flex-wrap items-center gap-1.5">
+                  <PlatformBadge platform={activity.platform} />
+                </div>
+                <div className="mt-2 text-[11px] text-zinc-500">
+                  {dateDisplay.detail}
+                </div>
               </div>
-              <div className="mt-2 text-[11px] text-zinc-500">
-                {dateDisplay.detail}
-              </div>
+
+              <ActivityImage src={activity.image.src} alt={activity.image.alt} />
             </div>
 
-            <ActivityImage src={activity.image.src} alt={activity.image.alt} />
-          </div>
-
-          <div className="mt-3 flex flex-wrap items-center gap-2">
-            <button
-              type="button"
-              className={cn(
-                actionBaseClass,
-                "bg-violet-100 text-violet-700 hover:bg-violet-100/80"
-              )}
-            >
-              查看回顾
-            </button>
-            <button
-              type="button"
-              className={cn(
-                actionBaseClass,
-                "bg-zinc-100 text-zinc-600 hover:bg-zinc-100/80"
-              )}
-            >
-              相关动态
-            </button>
+            <div className="mt-3 flex flex-wrap items-center gap-2">
+              <button
+                type="button"
+                onClick={handleComingSoon}
+                className={cn(
+                  actionBaseClass,
+                  "bg-violet-100 text-violet-700 hover:bg-violet-100/80"
+                )}
+              >
+                查看回顾
+              </button>
+              <button
+                type="button"
+                onClick={handleComingSoon}
+                className={cn(
+                  actionBaseClass,
+                  "bg-zinc-100 text-zinc-600 hover:bg-zinc-100/80"
+                )}
+              >
+                相关动态
+              </button>
+            </div>
           </div>
         </div>
-      </div>
-    </article>
+        </div>
+      </ActivityShell>
   )
 }
 

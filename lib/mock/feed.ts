@@ -46,6 +46,7 @@ export const feedItems: FeedItem[] = [
     publishedAt: "2小时前",
     thumbnailUrl: "/images/feed/zlh1.jpg",
     originalUrl: "https://weibo.com/",
+    relatedFeedItemIds: ["activity-studio-bts-release"],
   },
   {
     id: "xiaohongshu-1",
@@ -56,6 +57,7 @@ export const feedItems: FeedItem[] = [
     publishedAt: "今天12:30",
     thumbnailUrl: "/images/feed/zlh2.jpg",
     originalUrl: "https://www.xiaohongshu.com/",
+    relatedFeedItemIds: ["activity-magazine-release"],
   },
   {
     id: "douyin-1",
@@ -66,6 +68,7 @@ export const feedItems: FeedItem[] = [
     publishedAt: "1小时前",
     thumbnailUrl: "/images/feed/zlh3.jpg",
     originalUrl: "https://www.douyin.com/",
+    relatedFeedItemIds: ["activity-cotton-times-live"],
   },
   {
     id: "tencent-1",
@@ -76,6 +79,7 @@ export const feedItems: FeedItem[] = [
     publishedAt: "今天",
     thumbnailUrl: "/images/feed/zlh4.jpg",
     originalUrl: "https://v.qq.com/",
+    relatedFeedItemIds: ["activity-begin-investigation-ep5"],
   },
   {
     id: "taobao-live-1",
@@ -86,6 +90,7 @@ export const feedItems: FeedItem[] = [
     publishedAt: "30分钟前",
     thumbnailUrl: "/images/feed/zlh5.jpg",
     originalUrl: "https://live.taobao.com/",
+    relatedFeedItemIds: ["activity-cotton-times-live"],
   },
   {
     id: "ins-1",
@@ -96,5 +101,6 @@ export const feedItems: FeedItem[] = [
     publishedAt: "3小时前",
     thumbnailUrl: "/images/feed/zlh2.jpg",
     originalUrl: "https://www.instagram.com/",
+    relatedFeedItemIds: ["activity-begin-investigation-ep6"],
   },
 ]

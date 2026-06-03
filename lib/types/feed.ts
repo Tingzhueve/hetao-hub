@@ -17,5 +17,5 @@ export interface FeedItem {
   publishedAt: string
   thumbnailUrl?: string
   originalUrl: string
+  relatedFeedItemIds?: string[]
 }
-
