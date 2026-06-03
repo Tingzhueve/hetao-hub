@@ -97,3 +97,7 @@ export const calendarActivities: CalendarActivity[] = [
 export function getCalendarActivityBySlug(slug: string) {
   return calendarActivities.find((activity) => activity.slug === slug)
 }
+
+export function getCalendarActivityById(id: string) {
+  return calendarActivities.find((activity) => activity.id === id)
+}

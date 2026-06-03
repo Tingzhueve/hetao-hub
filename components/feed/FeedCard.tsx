@@ -2,6 +2,8 @@
 
 import Image from "next/image"
 import * as React from "react"
+import { useRouter } from "next/navigation"
+import { useFavorites } from "@/components/favorites/FavoritesProvider"
 import type { FeedItem, SourcePlatform } from "@/lib/types/feed"
 import { Card, CardContent } from "@/components/ui/card"
 import { cn } from "@/lib/utils"
@@ -84,13 +86,30 @@ function FeedThumbnail({
   )
 }
 
-export function FeedCard({ item }: { item: FeedItem }) {
-  const [isFavorited, setIsFavorited] = React.useState(false)
+export function FeedCard({
+  item,
+  favoriteButtonMode = "default",
+}: {
+  item: FeedItem
+  favoriteButtonMode?: "default" | "remove"
+}) {
+  const router = useRouter()
+  const { isFavorited, toggleFavorite } = useFavorites()
+  const favorited = isFavorited(item.id)
   const primaryLabel = getPrimaryActionLabel(item.source)
 
   return (
     <Card
       size="sm"
+      role="link"
+      tabIndex={0}
+      onClick={() => router.push(`/feed/${item.id}`)}
+      onKeyDown={(event) => {
+        if (event.key === "Enter" || event.key === " ") {
+          event.preventDefault()
+          router.push(`/feed/${item.id}`)
+        }
+      }}
       className="gap-0 rounded-2xl border border-violet-100/60 bg-white pb-1.5 pt-2.5 shadow-[0_2px_12px_rgba(91,33,182,0.06)] ring-1 ring-violet-100/50"
     >
       <CardContent className="px-0 pt-0 pb-0">
@@ -123,6 +142,7 @@ export function FeedCard({ item }: { item: FeedItem }) {
                 href={item.originalUrl}
                 target="_blank"
                 rel="noopener noreferrer"
+                onClick={(event) => event.stopPropagation()}
                 className={cn(
                   softActionBase,
                   "bg-violet-100 text-violet-700 hover:bg-violet-100/80"
@@ -133,15 +153,22 @@ export function FeedCard({ item }: { item: FeedItem }) {
 
               <button
                 type="button"
-                onClick={() => setIsFavorited((v) => !v)}
+                onClick={(event) => {
+                  event.stopPropagation()
+                  toggleFavorite(item.id)
+                }}
                 className={cn(
                   softActionBase,
                   "bg-zinc-100 text-zinc-600 hover:bg-zinc-100/80",
-                  isFavorited && "bg-rose-50 text-rose-600"
+                  favorited && "bg-rose-50 text-rose-600"
                 )}
-                aria-label={isFavorited ? "取消收藏" : "收藏"}
+                aria-label={favorited ? "取消收藏" : "收藏"}
               >
-                {isFavorited ? "♥ 已收藏" : "♡ 收藏"}
+                {favoriteButtonMode === "remove"
+                  ? "移除收藏"
+                  : favorited
+                    ? "♥ 已收藏"
+                    : "♡ 收藏"}
               </button>
             </div>
           </div>

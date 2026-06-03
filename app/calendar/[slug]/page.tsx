@@ -35,7 +35,7 @@ export default async function ActivityDetailPage(
   }
 
   const relatedUpdates = feedItems.filter((item) =>
-    item.relatedFeedItemIds?.includes(activity.id)
+    item.relatedActivityIds?.includes(activity.id)
   )
 
   const statusLabel =
@@ -124,11 +124,8 @@ export default async function ActivityDetailPage(
                     id="related-updates-heading"
                     className="text-[15px] font-semibold tracking-tight text-zinc-900"
                   >
-                    Related Updates
+                    相关动态
                   </h2>
-                  <p className="mt-1 text-[12px] text-zinc-500">
-                    关联到这个活动的官方动态
-                  </p>
                 </div>
               </div>
 

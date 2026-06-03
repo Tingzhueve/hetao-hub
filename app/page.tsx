@@ -1,4 +1,5 @@
 import Image from "next/image"
+import { FavoritesCount } from "@/components/favorites/FavoritesCount"
 import { FeedList } from "@/components/feed/FeedList"
 import { BottomTabBar } from "@/components/shell/BottomTabBar"
 import { Badge } from "@/components/ui/badge"
@@ -57,7 +58,9 @@ export default function FeedPage() {
             </div>
             <div className="rounded-2xl border border-white/70 bg-white/85 px-3.5 py-2 shadow-[0_2px_10px_rgba(91,33,182,0.05)] ring-1 ring-violet-100/70 backdrop-blur-sm">
               <div className="text-[11px] text-muted-foreground">我的收藏</div>
-              <div className="mt-0.5 text-lg font-semibold text-zinc-900">0</div>
+              <div className="mt-0.5 text-lg font-semibold text-zinc-900">
+                <FavoritesCount />
+              </div>
             </div>
           </div>
         </header>
